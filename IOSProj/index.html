@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <title>Hello, World</title>
+        <title>Login</title>
         <link href="jquery-mobile/jquery.mobile-1.3.0.min.css" rel="stylesheet" type="text/css" />
         <link href="styles/main.css" rel="stylesheet" type="text/css" />
 
@@ -11,70 +11,136 @@
         <script src="jquery-mobile/jquery.mobile-1.3.0.min.js" type="text/javascript"></script>
         <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
         <script src="js/hello-world.js" type="text/javascript"></script>
+
     </head> 
     <body> 
         
-        <div data-role="page" id="home">
-            <div data-role="header">
-                <h1>Hello, World!</h1>
-            </div>
-            <div data-role="content">
-                <h1>Welcome to Icenium!</h1>
-                <p>
-                    Icenium&trade; enables you to build cross-platform device applications regardless of your 
-                    development platform by combining the convenience of a local development toolset with the 
-                    power and flexibility of the cloud.
-                </p>
-            </div>
-            <div class="nav">
-                <ul data-role="listview">
-                    <li><a href="#page1" data-transition="slide">UI Interaction Example</a></li>
-                    <li><a href="#page2" data-transition="slide">Geolocation Example</a></li>
-                </ul>
-            </div>
-            <div data-role="footer" data-position="fixed" data-id="oneFooter">
-                <span class="footerText">Built with Icenium&trade;</span>
-            </div>
-        </div>
-        
-        <!-- The following page demonstrates basic user interaction. -->
-        <div data-role="page" id="page1" data-add-back-btn="true">
-            <div data-role="header">
-                <h1>Hello</h1>
-            </div>
-            <div data-role="content">
-                <h1>Say Hello!</h1>
-                <div id='helloWorldInput'>
-                    <label for="txtName">Enter your name:</label>
-                    <input type="text" id="txtName" value="" />
-                </div>
-                <div id='helloWorldText' style="display:block;"></div>
-                <div align="center">
-                    <div data-role="controlgroup" style="display:inline-block;" data-type="horizontal">
-                        <button data-icon="delete" onClick="sayHelloReset();">Reset</button>
-                        <button data-theme="a" onClick="sayHello();">Submit</button>
+        <div data-role="page" style="background:url('images/Background-fix.jpg'); background-repeat: no-repeat; background-size: 100% 100%;" id="main">
+            
+            <div data-role="content" >
+                       
+                    <div data-theme="b" id="header">   
+                        <table>
+                            <tr>
+                                <td width="30%" ><img src="images/Supervisor.png"/></td>
+                                <td width="70%" style="text-align:left; color:White; font-size:large"><h1>iSite Supervisor</h1></td>
+                            </tr>
+                        </table>
+                        
+                        <br>
+                        <label for="textinput-hide" class="ui-hidden-accessible">username</label>
+                        <input name="textinput-hide" id="UserName" placeholder="username" value="" type="text">
+                        <label for="textinput-hide" class="ui-hidden-accessible">password</label>
+                        <input name="textinput-hide" id="Password" placeholder="password" value="" type="password">
+                        
+                        <div id="errorMessage" style="color: red; font-size: small;"></div>  
+                        <br>
+                        <input type="button" value="Log in" id="loginButton" data-theme="a"/>
+
                     </div>
-                </div>
+                    
+
             </div>
-            <div data-role="footer" data-position="fixed"  data-id="oneFooter">
-                <span class="footerText">Built with Icenium&trade;</span>
+            <div data-role="footer" data-position="fixed" data-id="oneFooter" id="footer" data-theme="b" style="background:rgba(65,105,225,0.1);">
+                <p style="text-align:center; color:Gray; font-size:small">© 2012 | Powered by DinotaIT.</p>   
             </div>
         </div>
         
-        <!-- The following page demonstrates how to access device sensors using Apache Callback (aka PhoneGap) -->
-        <div data-role="page" id="page2" data-add-back-btn="true">
-            <div data-role="header">
-                <h1>Geolocation Example</h1>
-            </div>
-            <div data-role="content">
-                <h1>My Location</h1>
-                <div id="myLocation">Unable to get location information. Please check your network connection and try again.</div>
-                <button data-icon="refresh" onClick="getLocation();">Refresh Location</button>
-                <div id="map_canvas"></div>
-            </div>
-            <div data-role="footer" data-position="fixed" data-id="oneFooter">
-                <span class="footerText">Built with Icenium&trade;</span>
-            </div>
-        </div>
+        
     </body>
     </html>
+
+<script type="text/javascript">
+    
+    var originalHeight;
+        var originalWidth;
+        
+        $(document).ready(function () {
+        
+        try {
+        
+            originalHeight = $(window).height();
+            
+            originalWidth = $(window).width();
+            
+            //customOrientation();
+            //window.onorientationchange = customOrientation;
+        
+
+        } catch (err) {
+        alert(err);
+        }
+        
+        });
+        
+        function customOrientation() {
+        
+            var orientation = window.orientation;
+            switch(orientation) {
+            
+            case 0:
+                var headerHeight = $('#header').height();
+                var footerHeight = $('#footer').height();           
+                var totalHeight = headerHeight + footerHeight;
+                $('#main').css('height', ((originalHeight - totalHeight)-34));
+                break;
+            
+            case 90:
+                var headerHeight1 = $('#header').height();
+                var footerHeight1 = $('#footer').height();           
+                var totalHeight1 = headerHeight1 + footerHeight1;
+                $('#main').css('height', ((originalWidth - totalHeight1)-54));
+                break;
+            
+            case -90:
+                var headerHeight2 = $('#header').height();
+                var footerHeight2 = $('#footer').height();           
+                var totalHeight12= headerHeight2 + footerHeight2;
+                $('#main').css('height', ((originalWidth - totalHeight12)-54));
+                break;
+            case 180:
+                var headerHeight3 = $('#header').height();
+                var footerHeight3 = $('#footer').height();           
+                var totalHeight3 = headerHeight3 + footerHeight3;
+                $('#main').css('height', ((originalHeight - totalHeight3)-34));
+                break;
+            }
+        }
+
+    $('#loginButton').unbind('click').bind('click', function () {
+        $("#errorMessage").text('').fadeIn(1);
+        authentication();    
+    });
+    
+    function authentication() {
+        
+      var userName = $("#UserName").val();
+      var password = $("#Password").val(); 
+      
+      if(userName == "" || password == ""){
+          errorDisplayUserName("The username or password is required.");   
+      }  
+      else if(userName != "" && password != ""){
+      
+          if(password == "123456"){
+              if(userName == "dinota" || userName == "Dinota"){
+                  location.href='home.html'    
+              }
+              else{
+                  errorDisplayUserName("The username or password provided is incorrect.");         
+              }
+          }
+          
+      }
+       
+    }
+    
+    function errorDisplayUserName(error) {
+        $("#errorMessage").text(error).fadeOut(4000);
+    }
+    
+    function errorDisplayPassword(error) {
+        $("#errorMessage").text(error).fadeOut(4000);
+    }
+        
+</script>

@@ -1,0 +1,105 @@
+<!DOCTYPE html> 
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Login</title>
+        <link href="jquery-mobile/jquery.mobile-1.3.0.min.css" rel="stylesheet" type="text/css" />
+        <link href="styles/main.css" rel="stylesheet" type="text/css" />
+
+        <script src="cordova.js" type="text/javascript"></script>
+        <script src="jquery-mobile/jquery-1.8.2.min.js" type="text/javascript"></script>
+        <script src="jquery-mobile/jquery.mobile-1.3.0.min.js" type="text/javascript"></script>
+        <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+        <script src="js/hello-world.js" type="text/javascript"></script>
+    </head> 
+    <body> 
+               
+        <!-- The following page demonstrates how to access device sensors using Apache Callback (aka PhoneGap) -->
+        <div data-role="page" id="page2" data-add-back-btn="true" data-theme="a" style="background:url('images/Background-fix.jpg'); background-repeat: no-repeat; background-size: 100% 100%;">
+            
+                <div data-role="header" style="background:rgb(20,36,51);">
+                        <a data-icon="back" href="javascript: window.history.go(-1)">back</a>             
+                        <h1>Stage</h1>    
+                        <a data-icon="home" href="home.html">home</a>  
+                </div>
+    
+                <div data-role="content">
+                       
+                            <ul data-role="listview" data-inset="true">
+                        
+                                <li data-role="list-divider" data-theme="a" style="background:rgb(20,36,51);">Selected Job</li>
+                        
+                                <li data-role="fieldcontain" style="background:rgba(255,255,255,0.1);">
+                                    <label for="JobNumber" style="font-weight:bold;font-size:small">Job Number </label>
+                                    <label for="JobNumber" style="font-weight:bold;font-size:small" id="JobNumberValue"></label>
+                                    <input id="hiddenJobNumber" name="JobNumber" type="hidden"/>    
+                                    <input id="hiddenJobId" name="JobId" type="hidden"/>   
+                                    <input data-val="true" data-val-number="The field SupervisorId must be a number." data-val-required="The SupervisorId field is required." id="hiddenSupervisorId" name="SupervisorId" type="hidden" value="33802" />   
+                                </li>
+                            </ul>
+            
+        
+                            <div>
+        
+                                <ul data-role="listview" data-inset="true" id="majorstagelistview" data-filter="true" data-filter-placeholder="Filter by name..">
+                            
+                                                            <li data-icon="arrow-r" style="background:rgba(255,255,255,0.1);">
+                                                                <a href="" onclick="location.href='FileUpload.html?JobId=10165&amp;JobNumber=1003MLA034&amp;MajorStageId=3&amp;MajorStageName=Frame%20stage&amp;SupervisorId=33802'">Frame stage</a> 
+                                                            </li>
+                                                            <li data-icon="arrow-r" style="background:rgba(255,255,255,0.1);">
+                                                                <a href="" onclick="location.href='FileUpload.html?JobId=10165&amp;JobNumber=1003MLA034&amp;MajorStageId=1&amp;MajorStageName=Pre%20site%20construction%2FSite%20sign&amp;SupervisorId=33802'">Pre site construction/Site sign</a> 
+                                                            </li>
+                                                            <li data-icon="arrow-r" style="background:rgba(255,255,255,0.1);">
+                                                                <a href="" onclick="location.href='FileUpload.html?JobId=10165&amp;JobNumber=1003MLA034&amp;MajorStageId=5&amp;MajorStageName=Fixing%20stage&amp;SupervisorId=33802'">Fixing stage</a> 
+                                                            </li>
+                                                            <li data-icon="arrow-r" style="background:rgba(255,255,255,0.1);">
+                                                                <a href="" onclick="location.href='FileUpload.html?JobId=10165&amp;JobNumber=1003MLA034&amp;MajorStageId=10&amp;MajorStageName=Service&amp;SupervisorId=33802'">Service</a> 
+                                                            </li>
+                                                            <li data-icon="arrow-r" style="background:rgba(255,255,255,0.1);">
+                                                                <a href="" onclick="location.href='FileUpload.html?JobId=10165&amp;JobNumber=1003MLA034&amp;MajorStageId=6&amp;MajorStageName=Final%20%2FPCI%20stage&amp;SupervisorId=33802'">Final /PCI stage</a> 
+                                                            </li>
+                                        
+                                 </ul>
+        
+                            </div>
+                    </div>
+            </div>
+    </body>
+    </html>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        try {
+
+            //alert(window.location.toString());
+            
+            var jobNumber = getParameterByName("JobNumber");
+            $("#JobNumberValue").text(jobNumber);
+            $("#hiddenJobNumber").val(jobNumber);
+            
+            var jobId = getParameterByName("JobId");
+            $("#hiddenJobId").val(jobId);
+            
+            
+        } catch (err) {
+            alert(err);
+        }
+
+    });
+    
+    function getParameterByName(name){   
+        
+        name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+        var regexS = "[\\?&]"+name+"=([^&#]*)"; 
+        var regex = new RegExp( regexS );
+        var results = regex.exec( window.location.href );
+        if( results == null ) 
+         return "";   
+       else    
+        return decodeURIComponent(results[1].replace(/\+/g, " "));
+    } 
+    
+</script>
+

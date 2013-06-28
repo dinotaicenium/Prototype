@@ -1,0 +1,636 @@
+<!DOCTYPE html> 
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>File Upload</title>
+        <link href="jquery-mobile/jquery.mobile-1.3.0.min.css" rel="stylesheet" type="text/css" />
+        <link href="styles/main.css" rel="stylesheet" type="text/css" />
+
+        <script src="cordova.js" type="text/javascript"></script>
+        <script src="jquery-mobile/jquery-1.8.2.min.js" type="text/javascript"></script>
+        <script src="jquery-mobile/jquery.mobile-1.3.0.min.js" type="text/javascript"></script>
+        <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+        <script src="js/hello-world.js" type="text/javascript"></script>
+        <script src="js/megapix-image.js" type="text/javascript"></script>
+    </head> 
+    <body> 
+               
+        <input type="hidden" value="10165" id="hiddenJobId">
+        <input type="hidden" value="1003MLA034" id="hiddenJobNumber">
+        <input type="hidden" value="3" id="hiddenMajorStageId">
+        <input type="hidden" value="Frame stage" id="hiddenMajorStageName">
+        <input type="hidden" value="33802" id="hiddenSupervisorId">
+        
+        <!-- The following page demonstrates how to access device sensors using Apache Callback (aka PhoneGap) -->
+        <div data-role="page" id="page2" data-add-back-btn="true" style="background:url('images/Background-fix.jpg'); background-repeat: no-repeat; background-size: 100% 100%;">
+            
+            <div data-role="header" style="background:rgb(20,36,51);">
+                    <a data-icon="back" href="javascript: window.history.go(-1)">back</a>         
+                    <h1>File Upload</h1>
+                    <a data-icon="home" href="home.html">home</a>  
+            </div>
+
+            <div data-role="content">
+                <div>
+                    <p id="perror" style="color: white; background-color: red;"></p>
+                    <ul data-role="listview" id="uploadedfilelist" data-inset="true">
+                    </ul>
+                </div>
+                
+                <div>
+                    <input type="file" accept="image/*" name="fileToUpload[]" id="fileToUpload" style='display: none;' name="img" onchange="return fileSelected();"/>
+                    <input type = "button" value = "Choose image" onclick ="javascript:document.getElementById('fileToUpload').click();" data-theme="a">
+                    <ul data-role="listview" id="uploadfilelist" data-inset="true" data-split-theme="d" data-split-icon="delete" style="background:rgba(255,255,255,0.1);">
+                    </ul>
+                </div>
+                <div>
+                    <ul data-role="listview" data-inset="true" style="background:rgba(255,255,255,0.1);">
+                        <li data-role="fieldcontain" style="background:rgba(255,255,255,0.1);">
+                            <label id = "sizereducechkboxlbl" style="display: none">
+                            <input data-theme="a" type="checkbox" name="checkbox-0" id="sizereducechkbox" style="display: none" style="background:rgba(255,255,255,0.1);"/> Reduce size and upload </label>
+                            <input data-theme="a" type="button" onclick="uploadFiles();" value="Upload [max. 5 files]" style="background:rgba(255,255,255,0.1);"/>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </body>
+    </html>
+
+<script type="text/javascript">
+       
+    var count = 0;
+    var progresscount = 0;
+    var start;
+    var chromeCount = 0;
+    var i = 0;
+
+    var filequeue = new Array();
+    var jobimageuploadid = -1;
+
+    function fileSelected() {
+
+        try {
+
+            count = 0;
+            progresscount = 0;
+            var selectedfile;
+            var processingfile;
+            var processingfileuniquekey;
+
+            $("#perror").text('').fadeIn(1);
+            $("#uploadfilelist").listview("refresh");
+
+            var files = document.getElementById('fileToUpload').files;
+
+            if (filequeue.length > 4) {
+                errorDisplay('Maximum number of allowable file uploads has been exceeded!!');
+            } else {
+
+                selectedfile = files[0];
+
+                if (!selectedfile.type.match('image.*')) {
+                    errorDisplay('Only image files are allowed');
+                } else if (selectedfile.size > 10485760) {
+                    errorDisplay('Maximum file size exceeds');
+                }
+
+                if (selectedfile.type.match('image.*') && selectedfile.size < 10485760) {
+
+                    $("#sizereducechkbox").show("slow");
+                    $("#sizereducechkboxlbl").show("slow");
+
+                    processingfileuniquekey = "PC:00" + chromeCount + "-";
+                    var map = new Array(selectedfile, processingfileuniquekey);
+
+                    if (window.File && window.FileReader && window.FileList && window.Blob) {
+
+                        var reader = new FileReader();
+
+                        reader.onload = (function(theFile) {
+                            return function(e) {
+
+                                var li = document.createElement("li");
+                                li.setAttribute("data-icon", "delete");
+                                
+
+                                var newlink = document.createElement('a');
+                                newlink.setAttribute("href", "javascript:void(0);");
+                                newlink.setAttribute("onclick", "removeImage('" + processingfileuniquekey + "');");
+
+                                var img = document.createElement("img");
+                                img.setAttribute("src", e.target.result);
+                                img.setAttribute("height", "80");
+                                img.setAttribute("width", "80");
+                                newlink.appendChild(img);
+
+                                var h3 = document.createElement("h3");
+                                var h3Text = document.createTextNode(processingfileuniquekey + theFile.name);
+                                h3.appendChild(h3Text);
+                                newlink.appendChild(h3);
+
+                                var p = document.createElement("p");
+                                newlink.appendChild(p);
+
+                                li.appendChild(newlink);
+
+                                document.getElementById("uploadfilelist").appendChild(li);
+
+                                $("#uploadfilelist").listview("refresh");
+
+                                filequeue.push({ file: map, li: li });
+
+                                chromeCount = chromeCount + 1;
+
+                            };
+                        })(selectedfile);
+
+                        // Read in the image file as a data URL.
+                        reader.readAsDataURL(selectedfile);
+
+                    } else {
+
+                        $("#uploadfilelist").append('<li data-icon="delete" id=' + i + '><a href="javascript:void(0);" onclick="remove(' + i + ');">' + processingfile.name + '<p style="padding: 2px 0px 0px 0px"></p></a></li>');
+                        $("#uploadfilelist").listview("refresh");
+
+                        i = i + 1;
+                    }
+
+                }
+            }
+
+            $("#fileToUpload").val("");
+
+
+        } catch(err) {
+            alert("Exception " + err);
+        }
+    }
+
+    function removeImage(processingfileuniquekey) {
+
+        try {
+
+            $("#uploadfilelist li").each(function() {
+
+                if ($(this).find("h3").text().indexOf(processingfileuniquekey) != -1) {
+
+                    var containtext = $(this).find("h3").text();
+
+                    $(this).remove();
+
+                    for (var b = 0; b < filequeue.length; b++) {
+
+                        var processarray = filequeue[b];
+                        var processmap = processarray.file;
+
+                        if (containtext.indexOf(processmap[1]) != -1) {
+
+                            filequeue.splice(b, 1);
+
+                            break;
+                        }
+                    }
+
+                    $("#uploadfilelist").listview("refresh");
+
+                }
+
+
+            });
+
+            if (filequeue.length == 0) {
+                $('#sizereducechkbox').attr('checked', false);
+                $("#sizereducechkbox").checkboxradio("refresh");
+                $("#sizereducechkbox").fadeOut(100);
+                $("#sizereducechkboxlbl").fadeOut(100);
+            }
+
+            $("#uploadfilelist").listview("refresh");
+
+        } catch(err) {
+            alert("Exception " + err);
+        }
+    }
+
+    function uploadFiles() {
+
+        try {
+
+            if (filequeue != null && filequeue.length != 0) {
+                jobUploadHeaderInitialize(filequeue.length);
+            }
+
+        } catch(err) {
+            alert("Exception " + err);
+        }
+
+    }
+
+    function jobUploadHeaderInitialize(filesize) {
+
+        try {
+
+            var initilafilecount = 0;
+
+            count = 0;
+
+            var jobuploadheaderinitializeurl = "http://app.dinotait.com/ifile5/FileUpload/InitializeJobUploadHeader";
+            jobuploadheaderinitializeurl += "?bustCache=" + GUID();
+
+            $.ajax({
+                url: jobuploadheaderinitializeurl,
+                type: 'POST',
+                traditional: true,
+                data: {
+                    JobId: $('#hiddenJobId').val(),
+                    JobNumber: $('#hiddenJobNumber').val(),
+                    MajorStageId: $('#hiddenMajorStageId').val(),
+                    MajorStageName: $('#hiddenMajorStageName').val(),
+                    SupervisorId: $('#hiddenSupervisorId').val(),
+                    NoofFiles: filesize
+                },
+                success: function (response) {
+
+                    jobimageuploadid = response.JobImageUploadId;
+                    initilafilecount = response.InitialFileCount;
+
+                    if (jobimageuploadid != -1) {
+
+                        while (filequeue.length > 0) {
+
+                            var item = filequeue.pop();
+                            var processarray = item.file;
+                            var file = processarray[0];
+                            var key = processarray[1];
+
+                            if ($('#sizereducechkbox').is(':checked')) {
+                                resizeAndUpload(file, key, jobimageuploadid, initilafilecount, item);
+                            }
+                            else {
+                                upload(file, key, jobimageuploadid, initilafilecount, item);
+                            }
+
+                            initilafilecount = initilafilecount + 1;
+                        }
+
+                    }
+
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    errorDisplay('Upload starting fail due to an error..');
+                }
+
+
+            });
+        
+            } catch(err) {
+                alert("Exception " + err);
+            }
+
+        
+        
+    }
+
+    function GUID() {
+        var S4 = function () {
+            return Math.floor(
+                Math.random() * 0x10000 /* 65536 */
+            ).toString(16);
+        };
+
+        return (
+            S4() + S4() + "-" +
+                S4() + "-" +
+                    S4() + "-" +
+                        S4() + "-" +
+                            S4() + S4() + S4()
+        );
+    }
+
+    function upload(file, key, jobimageuploadid, initialfilecount, item) {
+
+        try {
+
+            var jobnumber = document.getElementById('hiddenJobNumber').value;
+            var majorstageid = document.getElementById('hiddenMajorStageId').value;
+
+            var uploadurl = "http://app.dinotait.com/ifile5/FileUpload/UploadFiles";
+            uploadurl += "?bustCache=" + GUID();
+
+            var li = item.li;
+
+            var xhr = new XMLHttpRequest(), upload = xhr.upload;
+
+            upload.addEventListener("loadstart", function (ev) {
+
+                var containtext = $(li).find("h3").text();
+                var index = containtext.indexOf(" upload error");
+
+                if (index != -1) {
+
+                    var refreshtext = containtext.substring(0, index);
+
+                    $(li).find('h3').text(refreshtext);
+                    $("#uploadfilelist").listview("refresh");
+
+
+                }
+                else {
+
+                    $("#uploadfilelist").listview("refresh");
+
+                }
+
+            }, false);
+
+            upload.addEventListener("progress", function (ev) {
+
+                if (ev.lengthComputable) {
+                    var percentComplete = Math.round(ev.loaded * 100 / ev.total);
+                    $(li).find("p").text("Uploading " + percentComplete + "%");
+                    $(li).find("p").css("color", "#3DD13F");
+                }
+
+            }, false);
+            upload.addEventListener("load", function (evt) {
+
+                $(li).find("h3").css("color", "#3DD13F");
+
+            }, false);
+            upload.addEventListener("error", function (ev) {
+
+                if (xhr.status != 500) {
+
+                    filequeue.push(item);
+
+                    var containtext = $(li).find("h3").text();
+                    $(li).find("h3").text(containtext + " upload error");
+                    $(li).find("h3").css("color", "#FF0000");
+                    $(li).find("p").text("Uploading 0%");
+                    $(li).find("p").css("color", "#FF0000");
+
+                }
+
+            }, false);
+
+            xhr.open("POST", uploadurl);
+
+            xhr.setRequestHeader("Content-type", "multipart/form-data");
+
+            xhr.setRequestHeader("X-File-Name", (key + file.name));
+
+            xhr.setRequestHeader("X-ImageUploadJob-Id", jobimageuploadid);
+            xhr.setRequestHeader("X-Folder-Name", jobnumber);
+            xhr.setRequestHeader("X-MajorStage-Id", majorstageid);
+            xhr.setRequestHeader("X-Sequence", initialfilecount);
+
+            xhr.setRequestHeader("X-File-Size", file.size);
+            xhr.setRequestHeader("X-File-Type", file.type);
+
+            xhr.send(file);
+
+//            var noResponseTimer = setTimeout(function () {
+//                xhr.abort();
+//                errorDisplay("Request timed out");
+//            }, 30000);
+
+            xhr.onreadystatechange = function () {
+
+                var containtext;
+
+                if (xhr.readyState != 4) {
+                    return;
+                }
+
+                else if (xhr.readyState == 4) {
+
+                    if (xhr.status == 500) {
+
+                        filequeue.push(item);
+
+                        containtext = $(li).find("h3").text();
+                        $(li).find("h3").text(containtext + " upload error");
+                        $(li).find("h3").css("color", "#FF0000");
+                        $(li).find("p").text("Uploading 0%");
+                        $(li).find("p").css("color", "#FF0000");
+
+                    }
+                    else if (xhr.status == 200) {
+
+                        //clearTimeout(noResponseTimer);
+                        containtext = $(li).find("h3").text();
+                        $(li).find("h3").text(containtext + " upload complete");
+                        $(li).fadeOut(5000);
+                    }
+                    
+
+                }
+
+            };
+
+            if (filequeue.length == 0) {
+
+                $('#sizereducechkbox').attr('checked', false);
+                $("#sizereducechkbox").checkboxradio("refresh");
+                $("#sizereducechkbox").fadeOut(100);
+                $("#sizereducechkboxlbl").fadeOut(100);
+
+                chromeCount = 0;
+
+            }
+
+
+        }
+
+        catch (err) {
+            alert("Exception " + err);
+        }
+    }
+
+
+    function resizeAndUpload(file, key, jobimageuploadid, initialfilecount, item) {
+
+        try {
+
+            var jobnumber = document.getElementById('hiddenJobNumber').value;
+            var majorstageid = document.getElementById('hiddenMajorStageId').value;
+
+            var uploadurl = "http://app.dinotait.com/ifile5/FileUpload/UploadSizeReducedFiles";
+            uploadurl += "?bustCache=" + GUID();
+
+            var mpImg = new MegaPixImage(file);
+
+            var li = item.li;
+
+            var reader = new FileReader();
+            reader.onloadend = function (evt) {
+
+                if (evt.target.readyState == FileReader.DONE) {
+
+                    var tempImg = new Image();
+                    tempImg.src = reader.result;
+                    tempImg.onload = function () {
+
+                        var MAX_WIDTH = 400;
+                        var MAX_HEIGHT = 300;
+                        var tempW = tempImg.width;
+                        var tempH = tempImg.height;
+                        if (tempW > tempH) {
+                            if (tempW > MAX_WIDTH) {
+                                tempH *= MAX_WIDTH / tempW;
+                                tempW = MAX_WIDTH;
+                            }
+                        } else {
+                            if (tempH > MAX_HEIGHT) {
+                                tempW *= MAX_HEIGHT / tempH;
+                                tempH = MAX_HEIGHT;
+                            }
+                        }
+
+                        var canvas = document.createElement('canvas');
+                        mpImg.render(canvas, { maxWidth: 800, maxHeight: 600 });
+
+                        var xhr = new XMLHttpRequest(), upload = xhr.upload;
+
+                        upload.addEventListener("loadstart", function (ev) {
+
+                            var containtext = $(li).find("h3").text();
+                            var index = containtext.indexOf(" upload error");
+
+                            if (index != -1) {
+
+                                var refreshtext = containtext.substring(0, index);
+
+                                $(li).find('h3').text(refreshtext);
+                                $("#uploadfilelist").listview("refresh");
+
+
+                            }
+                            else {
+
+                                $("#uploadfilelist").listview("refresh");
+
+                            }
+
+                        }, false);
+
+                        upload.addEventListener("progress", function (ev) {
+
+                            if (ev.lengthComputable) {
+                                var percentComplete = Math.round(ev.loaded * 100 / ev.total);
+                                $(li).find("p").text("Uploading " + percentComplete + "%");
+                                $(li).find("p").css("color", "#3DD13F");
+                            }
+
+                        }, false);
+                        upload.addEventListener("load", function (ev) {
+
+                            $(li).find("h3").css("color", "#3DD13F");
+
+                        }, false);
+                        upload.addEventListener("error", function (ev) {
+
+                            if (xhr.status != 500) {
+
+                                filequeue.push(item);
+
+                                var containtext = $(li).find("h3").text();
+                                $(li).find("h3").text(containtext + " upload error");
+                                $(li).find("h3").css("color", "#FF0000");
+                                $(li).find("p").text("Uploading 0%");
+                                $(li).find("p").css("color", "#FF0000");
+
+                            }
+
+                        }, false);
+
+
+                        xhr.open("POST", uploadurl);
+                        xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
+                        xhr.setRequestHeader("X-File-Name", (key + file.name));
+
+                        xhr.setRequestHeader("X-ImageUploadJob-Id", jobimageuploadid);
+                        xhr.setRequestHeader("X-Folder-Name", jobnumber);
+                        xhr.setRequestHeader("X-MajorStage-Id", majorstageid);
+                        xhr.setRequestHeader("X-Sequence", initialfilecount);
+
+                        xhr.setRequestHeader("X-File-Size", file.size);
+                        xhr.setRequestHeader("X-File-Type", file.type);
+
+                        var data = 'image=' + canvas.toDataURL("image/jpeg");
+                        xhr.send(data);
+
+//                        var noResponseTimer = setTimeout(function () {
+//                            xhr.abort();
+//                            errorDisplay("Request timed out");
+//                        }, 30000);
+
+                        xhr.onreadystatechange = function () {
+
+                            var containtext;
+
+                            if (xhr.readyState != 4) {
+                                return;
+                            }
+
+                            else if (xhr.readyState == 4) {
+
+                                if (xhr.status == 500) {
+
+                                    filequeue.push(item);
+
+                                    containtext = $(li).find("h3").text();
+                                    $(li).find("h3").text(containtext + " upload error");
+                                    $(li).find("h3").css("color", "#FF0000");
+                                    $(li).find("p").text("Uploading 0%");
+                                    $(li).find("p").css("color", "#FF0000");
+
+                                }
+                                else if (xhr.status == 200) {
+
+                                    //clearTimeout(noResponseTimer);
+                                    containtext = $(li).find("h3").text();
+                                    $(li).find("h3").text(containtext + " upload complete");
+                                    $(li).fadeOut(5000);
+                                }
+
+
+                            }
+
+                        };
+                        
+                        if (filequeue.length == 0) {
+
+                            $('#sizereducechkbox').attr('checked', false);
+                            $("#sizereducechkbox").checkboxradio("refresh");
+                            $("#sizereducechkbox").fadeOut(100);
+                            $("#sizereducechkboxlbl").fadeOut(100);
+
+
+                            chromeCount = 0;
+
+                        }
+                        
+                    };
+
+                };
+
+            };
+            reader.readAsDataURL(file);
+        }
+
+        catch (err) {
+            alert("Exception " + err);
+        }
+    }
+
+
+    function errorDisplay(error) {
+        $("#perror").text(error).fadeOut(4000);
+    }
+    
+    
+
+</script>
