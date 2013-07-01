@@ -48,40 +48,36 @@ body
 
 
 .Jobs{
-    margin-left: 16px;
     color:#ffffff;
     font-size:9pt;
     font-style:normal;
     font-weight:bold;
-    text-shadow: 1px 1px #383837;
- 
-   
-    
+    text-shadow: 1px 1px #383837;   
 }
 
 
 .Customer{
-    margin-left: 2px;
     color:#ffffff;
     font-size:9pt;
     font-style:normal;
     font-weight:bold;
-    text-shadow: 1px 1px #383837;
-   
-    
+    text-shadow: 1px 1px #383837;   
 }
 
 .Settings{
-    margin-left: 6px;
     color:#ffffff;
     font-size:9pt;
     font-style:normal;
     font-weight:bold;
     text-shadow: 1px 1px #383837;
+}
     
- 
-   
-    
+.Exit{
+    color:#ffffff;
+    font-size:9pt;
+    font-style:normal;
+    font-weight:bold;
+    text-shadow: 1px 1px #383837;    
 }
 
 .background{
