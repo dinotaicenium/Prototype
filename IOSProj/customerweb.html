@@ -14,28 +14,45 @@
 
 
 <script type="text/javascript" >
-        $(document).ready(function() {
-            
-            
-            
-  $.ajax({
-    type: "GET",
-    url: "http://10.20.10.69/iosservice/DataService.svc/GetData",
-    data: "{}",
-    contentType: "application/json; charset=utf-8",
-    dataType: "json",
-    success: function(msg) {
-     
-     $.each(msg, function(index, element) {
+  $(document).ready(function() {         
+      $.ajax({
+          
+            type: "GET",
+            url: "http://10.20.10.69/iosservice/DataService.svc/GetData",
+            data: "{}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function(msg) {
+             
+             $.each(msg, function(index, element) {
+                
+                 
+                                        var li = document.createElement("li");
+                                        li.setAttribute("data-icon", "false");
+                                        li.setAttribute("style", "background:rgba(255,255,255,0.1)");
+                                        
+                                        var newlink = document.createElement('a');
         
-         
-          $("#main ul").append("<li data-icon=\"arrow-r\" style=\"background:rgba(255,255,255,0.1);\"><a href=\"\" onclick=\"\">test</a> <p style=\"padding: 0px 0px 0px 15px\">"+element.Name+"</p></li>");
-        });
-       
+                                        var newlinkText = document.createTextNode(element.Name);
+                                        newlink.appendChild(newlinkText);
         
-    }
+                                        var p = document.createElement("p");
+                                        var pText = document.createTextNode("001");
+                                        p.appendChild(pText);
+                                        newlink.appendChild(p);
+        
+                                        li.appendChild(newlink);
+        
+                                        document.getElementById("customerlist").appendChild(li);
+        
+                                        $("#customerlist").listview("refresh");
+                  
+                });
+           
+            
+            }
       
-  });
+      });
  
 });
 </script>
@@ -54,7 +71,7 @@
              
             
          <div data-role="content" id="main">
-                           <ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter by id / name..">
+                           <ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter by id / name.." id="customerlist">
                                 
     
         
