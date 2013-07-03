@@ -65,6 +65,7 @@
   <ItemGroup>
     <Content Include="account.html" />
     <Content Include="customer.html" />
+    <Content Include="customerweb.html" />
     <Content Include="fileUpload.html" />
     <Content Include="images\Background-fix.jpg" />
     <Content Include="images\Customer.png" />
@@ -86,6 +87,7 @@
     <Content Include="js\megapix-image.js" />
     <Content Include="main.html" />
     <Content Include="majorStage.html" />
+    <Content Include="Settings.html" />
     <Content Include="styles\main.css" />
     <Content Include="cordova.ios.js">
       <Platform>iOS</Platform>
